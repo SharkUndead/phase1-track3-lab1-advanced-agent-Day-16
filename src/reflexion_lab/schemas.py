@@ -14,12 +14,16 @@ class QAExample(BaseModel):
     context: list[ContextChunk]
 
 class JudgeResult(BaseModel):
-    # TODO: Học viên định nghĩa các trường cần thiết cho kết quả đánh giá (score, reason, ...)
-    pass
+    score: int                          # 0 or 1
+    reason: str                         # one-sentence verdict
+    missing_evidence: list[str] = Field(default_factory=list)  # facts the answer failed to reach
+    spurious_claims: list[str] = Field(default_factory=list)   # wrong entities asserted
 
 class ReflectionEntry(BaseModel):
-    # TODO: Học viên định nghĩa các trường cần thiết cho một mục reflection (attempt_id, lesson, strategy, ...)
-    pass
+    attempt_id: int                     # which attempt triggered this reflection
+    failure_reason: str                 # copy of judge.reason for traceability
+    lesson: str                         # what went wrong (stored in reflection_memory[even])
+    next_strategy: str                  # concrete fix for next attempt (stored in reflection_memory[odd])
 
 class AttemptTrace(BaseModel):
     attempt_id: int
@@ -48,6 +52,7 @@ class ReportPayload(BaseModel):
     meta: dict
     summary: dict
     failure_modes: dict
+    difficulty_metrics: dict = Field(default_factory=dict)
     examples: list[dict]
     extensions: list[str]
     discussion: str
